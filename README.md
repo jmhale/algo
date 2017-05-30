@@ -100,33 +100,14 @@ Certificates and configuration files that users will need are placed in the `con
 
 No version of Android supports IKEv2. Install the [strongSwan VPN Client for Android 4 and newer](https://play.google.com/store/apps/details?id=org.strongswan.android). Import the corresponding user.p12 certificate to your device. See the [Android setup instructions](/docs/client-android.md) for more a more detailed walkthrough.
 
-### Windows
+### Windows 10
 
-Windows clients have a more complicated setup than most others. Follow the steps below to set one up:
-
-1. Copy the CA certificate (`cacert.pem`), user certificate (`$user.p12`), and the user PowerShell script (`windows_$user.ps1`) to the client computer.
-2. Import the CA certificate to the local machine Trusted Root certificate store.
-3. Open PowerShell as Administrator. Navigate to your copied files.
-4. If you haven't already, you will need to change the Execution Policy to allow unsigned scripts to run.
-
-```powershell
-Set-ExecutionPolicy Unrestricted -Scope CurrentUser
+Copy your PowerShell script `windows_{username}.ps1` and p12 certificate `{username}.p12` to the Windows client and run the following command as Administrator to configure the VPN connection.
+```
+powershell -ExecutionPolicy ByPass -File windows_{username}.ps1 Add
 ```
 
-5. In the same PowerShell window, run the included PowerShell script to import the user certificate, set up a VPN connection, and activate stronger ciphers on it.
-6. After you execute the user script, set the Execution Policy back before you close the PowerShell window.
-
-```powershell
-Set-ExecutionPolicy Restricted -Scope CurrentUser
-```
-
-Your VPN is now installed and ready to use.
-
-If you want to perform these steps by hand, you will need to import the user certificate to the Personal certificate store, add an IKEv2 connection in the network settings, then activate stronger ciphers on it via the following PowerShell script:
-
-```powershell
-Set-VpnConnectionIPsecConfiguration -ConnectionName "Algo" -AuthenticationTransformConstants GCMAES128 -CipherTransformConstants GCMAES128 -EncryptionMethod AES128 -IntegrityCheckMethod SHA384 -DHGroup ECP256 -PfsGroup ECP256
-```
+For a manual installation, see the [Windows setup instructions](/docs/client-windows.md).
 
 ### Linux Network Manager Clients (e.g., Ubuntu, Debian, or Fedora Desktop)
 
@@ -181,12 +162,11 @@ Use the example command below to start an SSH tunnel by replacing `user` and `ip
 
 To SSH into the Algo server for administrative purposes you can use the example command below by replacing `ip` with your own:
 
- `ssh ubuntu@ip -i ~/.ssh/algo.pem`
+ `ssh root@ip -i ~/.ssh/algo.pem`
 
 If you find yourself regularly logging into Algo then it will be useful to load your Algo ssh key automatically. Add the following snippet to the bottom of `~/.bash_profile` to add it to your shell environment permanently.
 
  `ssh-add ~/.ssh/algo > /dev/null 2>&1`
-
 
 ## Adding or Removing Users
 
