@@ -122,7 +122,6 @@
       -passout pass:"{{ easyrsa_p12_export_password }}"
     args:
       chdir: "configs/{{ IP_subject_alt_name }}/pki/"
-      creates: private/{{ item }}.p12
     with_items: "{{ users }}"
     register: p12
 
@@ -146,19 +145,14 @@
 
   - name: Revoke non-existing users
     shell: >
-      openssl ca
-      -config openssl.cnf
-      -passin pass:"{{ easyrsa_CA_password }}"
-      -revoke certs/{{ item }}.crt &&
       openssl ca -gencrl
       -config openssl.cnf
       -passin pass:"{{ easyrsa_CA_password }}"
       -revoke certs/{{ item }}.crt
       -out crl/{{ item }}.crt
-      touch crl/{{ item }}_revoked
     args:
       chdir: configs/{{ IP_subject_alt_name }}/pki/
-      creates: crl/{{ item }}_revoked
+      creates: crl/{{ item }}.crt
     environment:
       subjectAltName: "DNS:{{ item }}"
     when: item not in users
